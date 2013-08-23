@@ -1,0 +1,193 @@
+/*------------------------------------------------------------*/
+Mon Jul  2 02:58:39 EDT 2012
+pysyical desin:
+(I first caluculated that spinning the strip around
+2.5 times yields 3 whole 20 cm half circles, or a radius of about 3.15)
+construct a wood board with two poles 'glued' on the side.
+The poles are there to 'guide' the strip.
+The board is about 6 cm in the width.
+The height is that of the strip, 3 fold, plus space for the 
+arduino and connections.
+The poles, board, strip and device
+is constructed as modular as possible
+so that boards with diffrent sizes can be experimented with.
+
+[Ideally, the component mount on each other screwing them together using
+3 screws. (3 is the minimun number to insure spacial physical stability).
+More such screw connecting point are nneded for reserve or for the final
+tightened prototype.]
+/*------------------------------------------------------------*/
+there is a new arduino uno 3.
+/*------------------------------------------------------------*/
+a request to the artduino to turn it off.
+a push button on board to turn it on/off.
+The service process uses two areas in memory to hold the data
+and a flag to say which one is used.
+the run process uses the flag to decide which of the memory areas to show.
+the service process can force a gap between switching display by turning the system off
+for some duration.
+1. turn off.
+2. switch the memory flag.
+3. sleep ...
+4. turn on.
+/*------------------------------------------------------------*/
+an android application can download an ecg
+data file from the server and send to the arduibo through a local wifi,
+therby connecting almost effortlessly the arduino to the world.
+/*------------------------------------------------------------*/
+It is possible that scaling the time down will be better.
+Introduce a slow down factor in the arduino program.
+/*------------------------------------------------------------*/
+ecg data -> tas -> highcharts
+/*------------------------------------------------------------*/
+techincal design notes:
+	/*------------------------------------------------------------*/
+	Bird's eye:
+		There are two types of web servers:
+			1. the arduino device web server
+			  it listens to requests and serves a request in a loop until
+			  the next request comes, or until the request the turn off is sent instead.
+			2. the central control web server is a php application:
+				it has a databank of ecg recordings.
+				it can upload new recordings
+				it can send recordings to arduino devices.
+				(recordings are any subset of leads)
+			To stream a pseudo continues data send from the source
+			to the server rcg sample standard files every so often
+			and have the web server stream each request to the device
+			immeadiatly as it gets it. (nothing special here to do the actual 'streaming').
+
+			I envision a patient arriving at an ambulance and as soon as the paremdics can
+			attach the electrodes any cardioligoist anywhere can view:
+				ecg graphs on a standard web browser, delivered from the centeral webserver 
+				the arduino light show (having a separate public ip address),
+					pseudo contiously in real time.
+
+				say a standardized-for-this-pupose ecg is
+				a 2.5 seconds interval of 12 leads + a speaker channel.
+
+				By viewing the same 2.5 second over and over,
+				until the next request arrives (maybe some 30 seconds later )
+				the pattern recognition is enforced.
+				Each request can start with a special boot light show sequence to easily
+				separate requests.
+	/*------------------------------------------------------------*/
+	WEB Server -
+		The data transmitted to the device is composed of a header,
+		followed by a sequence of of values.
+		The header tells wich leads are transmitted,
+		(including the speaker?)
+
+		e.g.
+			GET ?leads=II,V1,V6,aVf
+
+			38a3b5 - light up LED of lead II with r=38 g=a3 b=b5 in this  'clock cycle'
+			... (V1)
+			... (V6)
+			... (aVf)
+
+			...
+
+			a compacted legible protocol of this example can look like this:
+				0,II,V1,V6,aVf
+				12,38a3b5,...,...,...
+				14,...
+
+			these rgb values are 16 bits per, the rgb strip is 8 bits per. (48 vs 24).
+			better normalize on sender side?
+/*------------------------------------------------------------*/
+arduino video tutorial series from jermey blum
+/*------------------------------------------------------------*/
+The WEB Server approach
+-----------------------
+a php web app that browses bridges between ECG data files and the EVE device.
+a set of ecg data files are on (or can be uploed to) the server.
+Picking a file, the web app shows an ecg graph and a set of controls.
+Controls send commands to the EVE device (via curl to an ip address?).
+commands can send indivudal leads or any combination of leads to the device.
+	andruino netShield is used in tandem with the andruino uno to connect
+	to the home lan, as described in the first example (sump water level email),
+	in the 'programing your home' book.
+	Q : this means the device is wired with an ethernet cable to the wifi router.
+		look into the arduino wifi shield:
+			http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1241939343
+
+it might be useful to add a speaker to the devie and send a sigal through it.
+the speaker sounds the combined 'displayed' leads, as chosen by the controls, (or it is off).
+	12 outputs - positive.
+	12 outputs - negative.
+	1 - speaker  ( analog )
+		more ouput with one baord:
+			http://hacknmod.com/hack/top-40-arduino-projects-of-the-web/
+			http://www.arduino.cc/en/Tutorial/ShiftOut
+
+/*------------------------------------------------------------*/
+/*------------------------------------------------------------*/
+/*------------------------------------------------------------*/
+the pitch story -
+	EVE - ECG Visualization Equipment
+	(The purpose of the EVE prototype is to show that)
+	With EVE, a doctor can identify heart diseases from ECG
+	with similar ease, speed and accurracy
+	with wich a person identifies a close relative or friend by
+	their walk, from some distance.
+
+	Lets take for example  LBBB
+
+	LBBB is short for Left Bundle Branch Block.
+	It is one of some 10 or so common heart condition that can be identified from an ECG.
+	In LBBB, the word bundle refers to "The Bundle of His" (pronounced hiss).
+	This bundle of tissues is responsible for some of the electric transmissions that occur in the heart.
+	It is comprised of some branches, one of which is termed - the left branch.
+	A condition when electrical transmissions are blocked to the left branch is therefore termed:
+	Left Bundle Branch block.
+	This changes the overall set of electrical tramissions that occur through the heart, and as such
+	can be detected from an ECG.
+	LBBB is identified on the ECG graphs by the identfication of cetrtain paterns that
+	characterize this particular condition.
+	Identifyng LBBB from ECG graph takes some knowledge and experience in analysing these graphs.
+
+	A person can identify the walk of close friends and relative from quite far off.
+	A tracker can tell the species of animal in the desert by ithe foot prints it leaves behind.
+	Doctors should be able to identify LBBB with the same ease.
+
+	EVE visualizes ECG perceputually.
+	It hides any numerical or otherwise complex data that might encourage concious thought.
+	EVE therebby enabls one's pattern recognitions abilities
+	to be applied to ECG heart failure identification.
+
+	EVE leverages our brain's intrisic ability to recognize and conceptualize
+	patterns of perceptual information.
+	/*------------------------------------------------------------*/
+	The speed is expected to be about 400ms, as concluded from researches
+	following the 1973 Johansson experiment.
+		-- Perception of Gait, James T. Todd, Brandeis University, 1983.
+/*------------------------------------------------------------*/
+basic operation
+	At the 'heart' of EVE there is a clock that pumps at the rate
+	of the sample rate. probably (about) once in 5 milliseconds.
+	(??? what is the most common standard,
+		Health Level-7 (HL7)? or is it just the data xml exchange format)
+
+	With each clock beat, one sample is read off of the 12 channels,
+	and the appropriate volume is sent to the LEDs.
+
+	the device is a set of LED layed out in a 3D space, representing
+	virtual positions of the ECG leads.
+	(see jpg with the heart in the center and 2 planes)
+	The planes are two boards of (plexiglass) with the heart in the center.
+	The heart contains the pcb(s) the control the device.
+/*------------------------------------------------------------*/
+EVE for android -
+	/*------------------------------------------------------------*/
+	1. an application that shows an ECG data file.
+	2. A real-time EVE connected to the monitor,
+		e.g. via gilgen and shimmer equipment.
+	/*------------------------------------------------------------*/
+	TABLET for large screen show
+	/*------------------------------------------------------------*/
+	A data file is shown in a coninuous loop.
+	/*------------------------------------------------------------*/
+	is there an android ready made ecg system that shows ecg graphs
+	on the android display.
+/*------------------------------------------------------------*/
